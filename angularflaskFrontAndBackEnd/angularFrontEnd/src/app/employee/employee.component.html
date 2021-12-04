@@ -1,0 +1,18 @@
+<h1>Welcome to Angular Flask Test App</h1>
+
+<p>employee works!</p>
+
+<div>
+    <button (click)="sayHi()">Say Hi</button>
+    <span>Server data: {{serverData | json}}</span>
+</div>
+
+<div>
+<button (click)="getAllEmployees()">All Employees</button>
+<span>All Employee data: {{employeeData | json}}</span>
+</div>
+
+<div>
+<button (click)="getEmployee()">Employees By ID</button>
+<span>Employee data: {{employee | json}}</span>
+</div>

@@ -1,0 +1,1 @@
+## Sinple app with Flak server and angular front end, no port listening
