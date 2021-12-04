@@ -1,4 +1,4 @@
 
 if __name__ == '__main__':
-    from src.scratchpad import scratchpad
-    scratchpad.main()
+    from src.workbench import workbench
+    workbench.main()
