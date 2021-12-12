@@ -30,27 +30,36 @@ class ProjectLogger:
     def get_logger(cls, name):
         return cls(name)
 
-    @property
-    def default_logger(self):
-        return ProjectLogger(self.DEFAULT)
+    @classmethod
+    def close_handlers(cls, logger_obj):
+        [handle.close() for handle in logger_obj.handlers]
 
     @staticmethod
     def log_set_up(log_name):
         if ProjectLogger.LOGGERS.get(log_name):
             return ProjectLogger.LOGGERS.get(log_name)
         logger = logging.getLogger(log_name)
-        log_file = f"{log_name}.log"
-        if log_name == ProjectLogger.DEFAULT:
-            log_dir = LOGS_DIR
-        else:
-            log_dir = os.path.join(LOGS_DIR, log_name)
-        os.makedirs(log_dir, exist_ok=True)
-        log_path = os.path.join(log_dir, log_file)
-        handler = TimedRotatingFileHandler(log_path, when="midnight", backupCount=ProjectLogger.FILE_BACKUP_COUNT)
-        handler.setFormatter(logging.Formatter(ProjectLogger.LOG_FORMAT))
 
-        logger.addHandler(handler)
+        # default
+        default_log_file = f"{ProjectLogger.DEFAULT}.log"
+        default_log_dir = LOGS_DIR
+        os.makedirs(default_log_dir, exist_ok=True)
+        default_log_path = os.path.join(default_log_dir, default_log_file)
+        default_handler = TimedRotatingFileHandler(default_log_path, when="midnight", backupCount=ProjectLogger.FILE_BACKUP_COUNT)
+        default_handler.setFormatter(logging.Formatter(ProjectLogger.LOG_FORMAT))
+        logger.addHandler(default_handler)
+
+        if log_name != ProjectLogger.DEFAULT:
+            log_file = f"{log_name}.log"
+            log_dir = os.path.join(LOGS_DIR, log_name)
+            os.makedirs(log_dir, exist_ok=True)
+            log_path = os.path.join(log_dir, log_file)
+            handler = TimedRotatingFileHandler(log_path, when="midnight", backupCount=ProjectLogger.FILE_BACKUP_COUNT)
+            handler.setFormatter(logging.Formatter(ProjectLogger.LOG_FORMAT))
+            logger.addHandler(handler)
+
         logger.setLevel(logging.INFO)
+        ProjectLogger.close_handlers(logger)
         ProjectLogger.LOGGERS[log_name] = logger
         return logger
 
@@ -58,8 +67,7 @@ class ProjectLogger:
         log_string = " ".join([str(l) for l in log_strings])
         if ProjectLogger.LOGS_ENABLED:
             getattr(self.logger_obj, level.lower())(log_string)
-            if self.logger_name != self.DEFAULT:
-                getattr(self.default_logger.logger_obj, level.lower())(log_string)
+            ProjectLogger.close_handlers(self.logger_obj)
         if self.CONSOLE_PRINT_ENABLED and print_stdout:
             print(log_string)
 
