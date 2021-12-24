@@ -66,8 +66,7 @@ class ProjectLogger:
     def logger(self, *log_strings, level="INFO", print_stdout=True):
         log_string = " ".join([str(l) for l in log_strings])
         if ProjectLogger.LOGS_ENABLED:
-            getattr(self.logger_obj, level.lower())(log_string)
-            ProjectLogger.close_handlers(self.logger_obj)
+            self.log_message(log_string, level)
         if self.CONSOLE_PRINT_ENABLED and print_stdout:
             print(log_string)
 
@@ -102,6 +101,13 @@ class ProjectLogger:
         os.makedirs(directory, exist_ok=True)
         with open(os.path.join(directory, file_name), "w") as log_file:
             json.dump(ProjectLogger.to_json(), log_file)
+
+    def log_message(self, log_string, level):
+        try:
+            getattr(self.logger_obj, level.lower())(log_string)
+            ProjectLogger.close_handlers(self.logger_obj)
+        except PermissionError:
+            self.log_message()
 
 
 LOG = ProjectLogger()

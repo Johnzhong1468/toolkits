@@ -29,8 +29,8 @@ if %ERRORLEVEL% neq 0 (
     goto end
 )
 
-call mkdir %FOLDER_ROOT%/../temp
-call mkdir %FOLDER_ROOT%/../logs
+call mkdir %FOLDER_ROOT%..\temp
+call mkdir %FOLDER_ROOT%..\logs
 
 :end
 pause
